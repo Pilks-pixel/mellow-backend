@@ -16,8 +16,8 @@ model User {
    email String @unique
    password String 
    meditationDuration Int
-   totalMeditations Int
-   meditationDates DateTime[]
+   totalMeditations Int @default(0)
+   meditations Meditation[]
 }
 
 model Meditation {
@@ -26,6 +26,6 @@ model Meditation {
   duration Int
   completed Boolean @default(false)
   createdAt DateTime
-  pupil User @relation(fields: [pupilId], references: [id])
-  pupilId String 
+  student User @relation(fields: [studentId], references: [id])
+  studentId String 
 }
