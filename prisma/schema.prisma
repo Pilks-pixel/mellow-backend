@@ -25,7 +25,7 @@ model Meditation {
   type String
   duration Int
   completed Boolean @default(false)
-  createdAt DateTime
+  createdAt DateTime @default(now())
   student User @relation(fields: [studentId], references: [id])
   studentId String 
 }
