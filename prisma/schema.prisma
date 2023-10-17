@@ -21,7 +21,7 @@ model User {
 }
 
 model Meditation {
-  id       String  @id @default(uuid())
+  id       String  @id @default(uuid()) 
   type String
   duration Int
   completed Boolean @default(false)
