@@ -25,7 +25,13 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/users", async (req: Request, res: Response) => {
-	const users = await prisma.user.findMany();
+	const users = await prisma.user.findMany({
+		include: {
+			_count: {
+				select: {meditations:true}
+			}
+		}
+	});
 	res.json({
 		success: true,
 		payload: users,
@@ -33,10 +39,13 @@ app.get("/users", async (req: Request, res: Response) => {
 	});
 });
 
-app.get("/users/id", async (req: Request, res: Response) => {
+app.get("/users/:id", async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const user = await prisma.user.findUnique({
 		where: { id: id },
+		include: {
+			meditations: true
+		},
 	});
 	res.json({
 		success: true,
@@ -55,14 +64,13 @@ app.post("/users", async (req: Request, res: Response) => {
 	});
 });
 
-// increase users meditation duration
-app.put("/users/id", async (req: Request, res: Response) => {
+
+app.put("/users/:id", async (req: Request, res: Response) => {
 	const { id } = req.params;
+	const updatedValue = req.body
 	const addDuration = await prisma.user.update({
 		where: { id: id },
-		data: { meditationDuration: {
-			increment: 30
-		}}
+		data: { ...updatedValue}
 	});
 	res.json({
 		success: true,
@@ -70,7 +78,7 @@ app.put("/users/id", async (req: Request, res: Response) => {
 	})
 })
 
-app.delete("/users/id", async (req: Request, res: Response) => {
+app.delete("/users/:id", async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const deleteUser = await prisma.user.delete({
 		where: {
@@ -99,6 +107,29 @@ app.post("/meditations", async (req: Request, res: Response) => {
 		payload: newMeditation,
 	});
 })
+
+app.delete("/meditations", async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const deleteUser = await prisma.meditation.deleteMany({});
+	res.json({
+		success: true,
+		payload: deleteUser,
+	});
+});
+
+// Delete Meditations from one User
+app.delete("/meditations/:id", async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const deleteUser = await prisma.meditation.deleteMany({
+		where: {
+			studentId: id,
+		},
+	});
+	res.json({
+		success: true,
+		payload: deleteUser,
+	});
+});
 
 // error route handling
 app.use((req: Request, res: Response, next) => {
